@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="WARN">
+    <appenders>
+        <Console name="CONSOLE">
+            <PatternLayout pattern="%d{HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+
+        <File name="INVALID_STATION" fileName="logs/invalidStation.log" >
+            <PatternLayout>
+                <pattern>%d{HH:mm:ss} [%t] %-5level %logger{36} - %msg%n</pattern>
+            </PatternLayout>
+            <Filters>
+                <MarkerFilter marker ="INVALID_STATION" />
+            </Filters>
+        </File>
+
+        <File name="INPUT_HISTORY" fileName="logs/inputHistory.log" >
+            <PatternLayout>
+                <pattern>%d{HH:mm:ss} [%t] %-5level %logger{36} - %msg%n</pattern>
+            </PatternLayout>
+            <Filters>
+                <MarkerFilter marker ="INPUT_HISTORY" />
+            </Filters>
+        </File>
+
+        <File name="EXCEPTION" fileName="logs/exceptions.log" >
+            <PatternLayout>
+                <pattern>%d{HH:mm:ss} [%t] %-5level %logger{36} - %msg%n</pattern>
+            </PatternLayout>
+            <Filters>
+                <MarkerFilter marker ="EXCEPTION" />
+            </Filters>
+        </File>
+
+    </appenders>
+    <loggers>
+
+        <root level="all">
+            <appender-ref ref="INVALID_STATION" level="info"/>
+            <appender-ref ref="INPUT_HISTORY" level="info"/>
+            <appender-ref ref="EXCEPTION" level="error"/>
+        </root>
+    </loggers>
+</configuration>
