@@ -21,7 +21,7 @@ public class Main {
         BigDecimal expenseSum = new BigDecimal(0).setScale(2, RoundingMode.HALF_UP);
 
         for (Operation operation : operations){
-            if (operation.getExpense().compareTo(BigDecimal.valueOf(0)) > 0) {
+            if (operation.getExpense().compareTo(BigDecimal.valueOf(0)) > 0) { // это разбивка расходов или я не понял?
                 System.out.println(operation);
             }
             incomeSum = incomeSum.add(operation.getExpense());
@@ -66,6 +66,6 @@ public class Main {
     }
 
     private static String[] splitDescription (String fragment){
-        return fragment.split("\\s{4}");
+        return fragment.split("\\s{4}"); // я думал тут будет боьше кода, но пихать это в добавление не стал, оно и так по моему нечитаемое уже
     }
 }
