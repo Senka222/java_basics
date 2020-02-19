@@ -18,68 +18,28 @@ public class Main {
 
         ArrayList<Operation> operations = parsingFromFile();
 
-        /*
-        BigDecimal incomeSum = new BigDecimal(0).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal expenseSum = new BigDecimal(0).setScale(2, RoundingMode.HALF_UP);
-
-        for (Operation operation : operations) {
-            incomeSum = incomeSum.add(operation.getIncome());
-            expenseSum = expenseSum.add(operation.getExpense());
-        }
-
-        System.out.println("Общий доход: \t" + incomeSum
-                + "\nОбщий расход: \t" + expenseSum);
-        */
-
         BigDecimal incomeSum = operations.stream()
                 .map(Operation::getIncome)
-                .reduce(BigDecimal::add)
-                .get()
-                .setScale(2, RoundingMode.HALF_UP); // нужно ли проверять на isPresent?
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
         System.out.println("Сумма доходов: " + incomeSum);
 
         BigDecimal expenseSum = operations.stream()
                 .map(Operation::getExpense)
-                .reduce(BigDecimal::add)
-                .get()
-                .setScale(2, RoundingMode.HALF_UP); // нужно ли проверять на isPresent?
-        System.out.println("Сумма расходов: " + expenseSum);
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);    // тогда вопрос, а где тогда лучше округлять, здесь нормально
+        System.out.println("Сумма расходов: " + expenseSum);    // или лучше здесь перед самым выводом
 
-
-        // Разбивка по расходу
         System.out.println("==========================\n" +
-                "Групировка расходов:");
-        operations.stream()
-                .filter(operation -> operation.getExpense().compareTo(BigDecimal.ZERO) > 0)
-                .collect(
-                        Collectors.groupingBy(Operation::getOperationDescription,
-                                Collectors.mapping(Operation::getExpense,
-                                        Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
-                ))
-                .forEach((description, sum) -> System.out.println(description + " : \t"  + sum));
-
-        // Разбивка по доходу
-        System.out.println("==========================\n" +
-                "Групировка доходов:");
-        operations.stream()
-                .filter(operation -> operation.getIncome().compareTo(BigDecimal.ZERO) > 0)
-                .collect(
-                        Collectors.groupingBy(Operation::getOperationDescription,
-                                Collectors.mapping(Operation::getIncome,
-                                        Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
-                        ))
-                .forEach((description, sum) -> System.out.println(description + " : \t"  + sum));
-
-
-        /*
-
+                "Групировка расходов и доходов:\n" +
+                "Описание: \tДоход\tРасход");
         operations.stream()
                 .collect(
                         Collectors.groupingBy(Operation::getOperationDescription,
                                 Collectors.mapping(Summary::fromOperation,
-                                        Collectors.reducing(BigDecimal.ZERO, Summary::merge) //  вообще не понимаю что здесь принимает
+                                        Collectors.reducing(new Summary(BigDecimal.ZERO, BigDecimal.ZERO), Summary::merge)
                 )))
-                .forEach((description, sum) -> System.out.println(description + ":\t" + sum.));
+                .forEach((description, sum) -> System.out.println(description + ": \t" + sum.income + "\t" + sum.expense));
 
     }
 
@@ -88,7 +48,7 @@ public class Main {
         BigDecimal expense;
 
         Summary(BigDecimal income, BigDecimal expense) {
-            this.income = income.setScale(2, RoundingMode.HALF_UP);
+            this.income = income.setScale(2, RoundingMode.HALF_UP);     // здесь вопрос аналогичный
             this.expense = expense.setScale(2, RoundingMode.HALF_UP);
         }
 
@@ -99,9 +59,6 @@ public class Main {
         static Summary fromOperation(Operation o) {
             return new Summary(o.getIncome(), o.getExpense());
         }
-
-
-         */
     }
 
 
@@ -119,7 +76,7 @@ public class Main {
                 }
                 operations.add(new Operation(
                         stringToLocalDate(fragments[3]),
-                        splitDescription(fragments[5]),
+                        cleanDescription(fragments[5]),
                         stringToBigDecimal(fragments[6]),
                         stringToBigDecimal(fragments[7])
                 ));
@@ -131,26 +88,15 @@ public class Main {
         }
         return operations;
     }
-    /*
-    правильно ли было возвращать массив? я делаю это из соображения
-    что нам вдруг могут понадобиться остальные части
-    да и поля оставлял по той же причине, но по-чикаем как говорится
 
-    private static String[] splitDescription (String fragment){
-
-        return fragment.split("\\s{4}");
-    }
-    */
-
-    private static String splitDescription (String description){
+    private static String cleanDescription (String description){
         String[] fragments = description.split("\\s{4}");
         fragments = fragments[1].split("/|\\\\");
         return fragments[fragments.length - 1].trim();
     }
 
     private static BigDecimal stringToBigDecimal (String fragment){
-        return BigDecimal.valueOf(Double.parseDouble(fragment.replaceAll("\"", "")
-                .replaceAll(",", ".")));
+        return new BigDecimal(fragment.replaceAll("\"", "").replaceAll(",", "."));
     }
 
     private static LocalDate stringToLocalDate (String fragment){
