@@ -1,37 +1,28 @@
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class Operation {
 
-    private String accountType;             //  Тип счета
-    private String accountNumber;           //  Номер счета
-    private String currency;                //  Валюта
-    private Date operationDay;              //  Дата оперции  // наверно LocalDate лучше?
-    private String referenceWiring;         //  Референс проводки
-    private String operationDescription;    //  Описание операции
-    private BigDecimal income;              //  Приход
-    private BigDecimal expense;             //  Расход
+    private LocalDate operationDay;
+    private String operationDescription;
+    private BigDecimal income;
+    private BigDecimal expense;
 
-    // не слишком ли большой конструктор?
-    public Operation(String accountType, String accountNumber, String currency, Date operationDay, String referenceWiring, String operationDescription, BigDecimal income, BigDecimal expense) {
-        this.accountType = accountType;
-        this.accountNumber = accountNumber;
-        this.currency = currency;
+    public Operation(LocalDate operationDay, String operationDescription, BigDecimal income, BigDecimal expense) {
+
         this.operationDay = operationDay;
-        this.referenceWiring = referenceWiring;
         this.operationDescription = operationDescription;
-        this.income = income.setScale(2, RoundingMode.HALF_UP);
-        this.expense = expense.setScale(2, RoundingMode.HALF_UP);
+        this.income = income;
+        this.expense = expense;
     }
 
     @Override
     public String toString() {
         return "Описание операции: \"" + operationDescription + "\"" +
-                "\n\tПриход: " + income + " " + currency +
-                "\n\tРасход: " + expense + " " + currency +
-                "\n\tДата операции: " + (new SimpleDateFormat("dd.MM.yy")).format(operationDay);
+                "\n\tПриход: " + income + " RUR" +
+                "\n\tРасход: " + expense + " RUR" +
+                "\n\tДата операции: " + operationDay.format(DateTimeFormatter.ofPattern("dd.MM.yy"));
     }
 
     public BigDecimal getIncome() {
@@ -42,7 +33,8 @@ public class Operation {
         return expense;
     }
 
-    public String getCurrency() {
-        return currency;
+    public String getOperationDescription(){
+        return operationDescription;
     }
 }
+
